@@ -1,11 +1,12 @@
 package co.archifact.cli;
 
 import co.archifact.cli.commands.InitCommand;
+import co.archifact.cli.handler.InitializeHandler;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "af",
-        description = "The 'af' CLI for cloud infrastructure management.",
-        subcommands = {InitCommand.class})
+        description = "The 'af' CLI for cloud infrastructure management."
+)
 public class ArchCliApplication implements Runnable {
 
     @Override
@@ -15,7 +16,11 @@ public class ArchCliApplication implements Runnable {
     }
 
     public static void main(String[] args) {
-        int exitCode = new CommandLine(new ArchCliApplication()).execute(args);
+        CommandLine commandLine = new CommandLine(new ArchCliApplication());
+        commandLine.addSubcommand(new InitCommand(
+                new InitializeHandler()
+        ));
+        int exitCode = commandLine.execute(args);
         System.exit(exitCode);
     }
 }

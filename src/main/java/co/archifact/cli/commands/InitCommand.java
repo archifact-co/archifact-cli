@@ -1,5 +1,6 @@
 package co.archifact.cli.commands;
 
+import co.archifact.cli.handler.InitializeHandler;
 import co.archifact.core.DeployResourcesRequest;
 import co.archifact.core.ResourceManagementServiceGrpc;
 import io.grpc.ManagedChannel;
@@ -10,25 +11,19 @@ import picocli.CommandLine.Option;
 @Command(name = "init", description = "Initializes a new 'archifact' project.")
 public class InitCommand implements Runnable {
 
-    @Option(names = {"-n", "--name"}, description = "The name of the project.", required = true)
-    private String projectName;
+    private final InitializeHandler initializeHandler;
+
+    @Option(names = {"-n", "--name"}, description = "The name of the workspace.", required = true)
+    private String workspaceName;
+
+    public InitCommand(final InitializeHandler initializeHandler) {
+        this.initializeHandler = initializeHandler;
+    }
 
     @Override
     public void run() {
-        System.out.printf("Initializing new 'archifact' project: %s%n", projectName);
-        // Implementation for initializing a new project
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 8080)
-                .usePlaintext()
-                .build();
+        System.out.printf("Initializing new 'archifact' workspace: %s%n", workspaceName);
 
-
-        ResourceManagementServiceGrpc.ResourceManagementServiceBlockingStub serviceBlockingStub
-                = ResourceManagementServiceGrpc.newBlockingStub(channel);
-
-        serviceBlockingStub.deployResources(
-                DeployResourcesRequest.newBuilder()
-                        .build()
-        );
-        channel.shutdown();
+        initializeHandler.initializeWorkspace(workspaceName);
     }
 }
